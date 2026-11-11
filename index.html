@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+  <meta name="theme-color" content="#f6efe4">
+  <title>아저씨 사랑해요</title>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #f6efe4;
+      --paper: #fffaf0;
+      --ink: #50372d;
+      --muted: #8b7467;
+      --ribbon: #983e43;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--ink);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Apple SD Gothic Neo",
+        sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:focus-visible {
+      outline: 3px solid var(--ribbon);
+      outline-offset: 6px;
+    }
+
+    main {
+      width: min(100%, 430px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding:
+        calc(30px + env(safe-area-inset-top))
+        24px
+        calc(36px + env(safe-area-inset-bottom));
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: var(--ribbon);
+      font-size: 10px;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      margin: 24px 0 12px;
+      font-family: Georgia, "AppleMyungjo", serif;
+      font-size: 29px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.9;
+      word-break: keep-all;
+    }
+
+    /* 선물 상자 */
+
+    .gift-area {
+      padding-top: 55px;
+    }
+
+    .gift-box {
+      position: relative;
+      display: block;
+      width: min(280px, 100%);
+      height: 230px;
+      margin: 30px auto 36px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      perspective: 900px;
+    }
+
+    .box-base {
+      position: absolute;
+      inset: 45px 8px 0;
+      border: 1px solid #67432f;
+      border-radius: 4px 4px 12px 12px;
+      background: #79503b;
+      box-shadow: 0 22px 35px #50372d24;
+    }
+
+    .box-base::before {
+      content: "FOR YOU · 11.11";
+      position: absolute;
+      top: 95px;
+      right: 0;
+      left: 0;
+      color: #f5e5ca;
+      font-family: Georgia, serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+    }
+
+    .box-lid {
+      position: absolute;
+      z-index: 2;
+      top: 30px;
+      right: 0;
+      left: 0;
+      height: 55px;
+      border-radius: 5px;
+      background: #93664c;
+      box-shadow: 0 6px 8px #39251d24;
+      transform-origin: 50% 0;
+      transition:
+        transform 900ms ease,
+        opacity 700ms ease;
+    }
+
+    .ribbon {
+      position: absolute;
+      z-index: 3;
+      top: 30px;
+      bottom: 0;
+      left: calc(50% - 15px);
+      width: 30px;
+      background: var(--ribbon);
+      transition:
+        opacity 400ms ease,
+        transform 600ms ease;
+    }
+
+    .bow {
+      position: absolute;
+      z-index: 4;
+      top: 0;
+      left: calc(50% - 55px);
+      width: 110px;
+      height: 50px;
+      transition:
+        opacity 400ms ease,
+        transform 600ms ease;
+    }
+
+    .bow::before,
+    .bow::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 2px;
+      width: 52px;
+      height: 36px;
+      border: 12px solid var(--ribbon);
+      border-radius: 65% 65% 15% 65%;
+      transform: rotate(18deg);
+    }
+
+    .bow::after {
+      left: 55px;
+      transform: scaleX(-1) rotate(18deg);
+    }
+
+    .gift-box.opened .box-lid {
+      opacity: 0;
+      transform: translateY(-90px) rotateX(55deg);
+    }
+
+    .gift-box.opened .ribbon,
+    .gift-box.opened .bow {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+
+    .hint {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.9;
+      word-break: keep-all;
+    }
+
+    /* 사진 카드 */
+
+    .photo-stage {
+      margin-top: 32px;
+      perspective: 1200px;
+      animation: appear 850ms both;
+    }
+
+    .photo-button {
+      position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      transform-style: preserve-3d;
+      transition: transform 850ms cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .photo-button.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .photo-face {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border-radius: 4px;
+      background: var(--paper);
+      box-shadow: 0 12px 35px #50372d1c;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .photo-front {
+      padding: 13px 13px 48px;
+      transform: rotateY(0deg);
+    }
+
+    .photo-front img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #e9dfd0;
+    }
+
+    .photo-caption {
+      position: absolute;
+      right: 0;
+      bottom: 17px;
+      left: 0;
+      font-family: Georgia, serif;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+    }
+
+    .photo-fallback {
+      position: absolute;
+      inset: 13px 13px 48px;
+      display: grid;
+      place-content: center;
+      padding: 20px;
+      background: #e9dfd0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 2;
+    }
+
+    .photo-back {
+      display: grid;
+      place-content: center;
+      padding: 30px;
+      background:
+        repeating-linear-gradient(
+          var(--paper) 0 30px,
+          #e7ddcc 31px 32px
+        );
+      transform: rotateY(180deg);
+    }
+
+    .photo-back span {
+      font-family: Georgia, "AppleMyungjo", serif;
+      font-size: 21px;
+      line-height: 2;
+    }
+
+    /* 편지 */
+
+    .letter {
+      margin-top: 28px;
+      padding: 28px 23px;
+      border-radius: 5px;
+      background: var(--paper);
+      box-shadow: 0 8px 30px #50372d09;
+      text-align: left;
+      animation: appear 600ms both;
+    }
+
+    .letter-label {
+      margin: 0 0 24px;
+      color: var(--ribbon);
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .letter-text {
+      margin: 0;
+      font-family: "AppleMyungjo", Georgia, serif;
+      font-size: 16px;
+      line-height: 2.05;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .skip-button {
+      display: block;
+      min-height: 44px;
+      margin: 20px 0 0 auto;
+      padding: 8px 0 8px 12px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    /* 음성 */
+
+    .voice-section {
+      margin-top: 28px;
+      animation: appear 800ms both;
+    }
+
+    .voice-button {
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 18px;
+      border: 0;
+      border-radius: 30px;
+      background: var(--ribbon);
+      color: #fff8ee;
+      box-shadow: 0 8px 20px #983e4320;
+      font-size: 15px;
+      letter-spacing: 1px;
+    }
+
+    audio {
+      display: block;
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    .audio-status {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      word-break: keep-all;
+    }
+
+    .footer {
+      margin-top: 42px;
+      color: #9b8270;
+      font-family: Georgia, serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 360px) {
+      main {
+        padding-right: 18px;
+        padding-left: 18px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <p class="eyebrow">NOVEMBER 11 · PEPPERO DAY</p>
+
+    <h1>
+      아저씨에게만<br>
+      드리고 싶은 것. 
+      
+    </h1>
+
+    <p class="subtitle">
+      작은 상자에,<br>
+       전하고 싶은 마음을 담았어요.
+    </p>
+
+    <!-- 첫 화면: 리본 상자 -->
+    <section id="giftArea" class="gift-area">
+      <button
+        id="openBox"
+        class="gift-box"
+        type="button"
+        aria-label="리본을 풀고 선물 상자 열기"
+      >
+        <span class="box-base" aria-hidden="true"></span>
+        <span class="box-lid" aria-hidden="true"></span>
+        <span class="ribbon" aria-hidden="true"></span>
+        <span class="bow" aria-hidden="true"></span>
+      </button>
+
+      <p id="boxHint" class="hint">
+        리본을 눌러 선물을 열어 주세요.
+      </p>
+    </section>
+
+    <!-- 두 번째 화면: 뒤집히는 사진 -->
+    <section id="photoStage" class="photo-stage" hidden>
+      <button
+        id="photoButton"
+        class="photo-button"
+        type="button"
+        aria-label="사진 뒤집고 편지 읽기"
+        aria-expanded="false"
+        aria-controls="letterSection"
+      >
+        <span class="photo-face photo-front">
+          <img id="photo" alt="선물에 담은 소중한 사진">
+
+          <span id="photoFallback" class="photo-fallback" hidden>
+            이곳에 우리의 사진을 담아 주세요.<br>
+            사진 파일 이름을 확인해 주세요.
+          </span>
+
+          <span class="photo-caption">
+            a little moment, with you.
+          </span>
+        </span>
+
+        <span class="photo-face photo-back" aria-hidden="true">
+          <span>
+            사진 뒤에도<br>
+            마음을 남겨 뒀어요.<br>
+            ♡
+          </span>
+        </span>
+      </button>
+
+      <p id="photoHint" class="hint">
+        사진을 누르면, 편지가 시작돼요.
+      </p>
+    </section>
+
+    <!-- 세 번째 화면: 편지 -->
+    <section
+      id="letterSection"
+      class="letter"
+      aria-label="편지"
+      hidden
+    >
+      <p class="letter-label">TO. MY LOVER</p>
+
+      <!-- 화면에 보이는 타이핑 효과 -->
+      <p id="letterText" class="letter-text"></p>
+
+      <button id="skipButton" class="skip-button" type="button">
+        편지 한 번에 보기
+      </button>
+    </section>
+
+    <!-- 편지가 끝나면 나타나는 음성 버튼 -->
+    <section id="voiceSection" class="voice-section" hidden>
+      <button
+        id="voiceButton"
+        class="voice-button"
+        type="button"
+        aria-controls="voiceAudio"
+      >
+        ▷ &nbsp; 글로 다 못 한 말
+      </button>
+
+      <audio
+        id="voiceAudio"
+        controls
+        preload="none"
+        aria-label="선물로 남긴 음성 메시지"
+        hidden
+      ></audio>
+
+      <p id="audioStatus" class="audio-status" role="status"></p>
+    </section>
+
+    <p class="footer">SWEET THINGS TAKE HEART.</p>
+  </main>
+
+  <script>
+    /* =========================================
+       여기 세 부분을 바꾸면 돼요.
+       사진과 음성 파일은 HTML과 같은 폴더에 넣으세요.
+       파일 이름은 확장자와 대소문자까지 맞춰 주세요.
+       ========================================= */
+
+    // 1. 사진 파일 이름
+    const PHOTO_FILE = "./최현욱.jpg";
+
+    // 2. 음성 파일 이름
+    // 아이폰 녹음 파일이면 "./voice.m4a"로 바꿔도 돼요.
+    const VOICE_FILE = "./음성.m4a";
+
+    // 3. 편지 내용
+    // 양 끝의 백틱(`)은 남겨 두고 안쪽 내용만 바꾸세요.
+    const LETTER = `아저씨에게.
+
+오늘 빼빼로 데이인데 아저씨가 단 것 잘 안 드시기도 하시고, 또 챙기면 부담스러우실 거 같아서.
+
+오늘 하루를 어떻게, 무얼 선물해드릴까 고민하다가 아저씨가 두고두고 볼 수 있는 걸 하나 드리고 싶었어요. 무울론, 오래 꺼내 볼 수 있는 마음도 함께요.
+
+아저씨와 나누는 평범한 하루가 좋아요. 별일 없었다는 이야기에도 귀를 기울이게 되고, 잘 잤다는 짧은 말에도 마음이 놓여요. 그렇게 사소한 순간마다 아저씨가 제 하루 안에 깊이 들어와 있다는 걸 느껴요.
+
+영원이라는 말을 쉽게 약속할 수는 없지만, 아저씨 옆에서는 자꾸 오래를 바라게 돼요. 내일도, 그다음 날도. 특별한 날이 아니어도 서로의 안부를 가장 먼저 궁금해하는 사이로요.
+
+오늘 준비한 달콤함과 선물은 여기까지지만, 아저씨에게 주고 싶은 마음은 아직 많이 남아 있어요.
+
+그러니까 이건, 내년 이맘 때에도 제 몫의 자리를 조금 남겨 달라는 이야기예요.
+
+2026년 11월 11일,
+아저씨 곁에 오래 있고 싶은 사람이.`;
+
+    /* =========================================
+       아래는 동작 코드예요.
+       ========================================= */
+
+    const get = (id) => document.getElementById(id);
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const photo = get("photo");
+    const audio = get("voiceAudio");
+    const letterText = get("letterText");
+    const voiceButton = get("voiceButton");
+    const audioStatus = get("audioStatus");
+
+    let boxOpened = false;
+    let photoFlipped = false;
+    let letterFinished = false;
+    let typingTimer;
+
+    // 사진 파일이 없을 때 안내 표시
+    photo.addEventListener("error", () => {
+      photo.hidden = true;
+      get("photoFallback").hidden = false;
+    });
+
+    photo.src = "./최현욱.jpg";
+
+    // 상자 열기
+    get("openBox").addEventListener("click", () => {
+      if (boxOpened) return;
+
+      boxOpened = true;
+      get("openBox").disabled = true;
+      get("openBox").classList.add("opened");
+      get("boxHint").textContent = "아저씨에게, 작은 선물 하나.";
+
+      window.setTimeout(() => {
+        get("giftArea").hidden = true;
+        get("photoStage").hidden = false;
+
+        get("photoButton").focus({
+          preventScroll: true
+        });
+      }, reducedMotion ? 0 : 950);
+    });
+
+    // 편지 완성 및 음성 버튼 표시
+    function finishLetter() {
+      if (letterFinished) return;
+
+      letterFinished = true;
+      window.clearTimeout(typingTimer);
+
+      letterText.textContent = LETTER;
+      get("skipButton").hidden = true;
+      get("voiceSection").hidden = false;
+    }
+
+    // 편지 한 글자씩 출력
+    function startLetter() {
+      get("letterSection").hidden = false;
+
+      if (reducedMotion || LETTER.length === 0) {
+        finishLetter();
+        return;
+      }
+
+      const characters = Array.from(LETTER);
+      let position = 0;
+
+      function typeNextCharacter() {
+        if (letterFinished) return;
+
+        const character = characters[position];
+        letterText.textContent += character;
+        position += 1;
+
+        if (position >= characters.length) {
+          finishLetter();
+          return;
+        }
+
+        // 줄바꿈에서는 잠시 쉬어요.
+        const delay = character === "\n" ? 700 : 110;
+
+        typingTimer = window.setTimeout(
+          typeNextCharacter,
+          delay
+        );
+      }
+
+      typeNextCharacter();
+    }
+
+    // 사진을 누르면 뒤집히고 편지 시작
+    get("photoButton").addEventListener("click", () => {
+      if (photoFlipped) return;
+
+      photoFlipped = true;
+
+      get("photoButton").classList.add("flipped");
+      get("photoButton").setAttribute("aria-expanded", "true");
+      get("photoButton").setAttribute(
+        "aria-label",
+        "사진 뒷면. 아래에 편지가 열렸어요."
+      );
+
+      get("photoHint").textContent =
+        "천천히 읽어 주세요. 마음은 여기 두고 갈게요.";
+
+      window.setTimeout(
+        startLetter,
+        reducedMotion ? 0 : 850
+      );
+    });
+
+    // 타이핑을 기다리지 않고 전체 편지 보기
+    get("skipButton").addEventListener("click", finishLetter);
+
+    // 버튼을 직접 누른 순간 음성 재생
+    voiceButton.addEventListener("click", async () => {
+      audio.hidden = false;
+      audioStatus.textContent = "";
+
+      if (!audio.getAttribute("src")) {
+        audio.src = "./음성.m4a";
+      }
+
+      try {
+        if (audio.paused) {
+          if (audio.ended) {
+            audio.currentTime = 0;
+          }
+
+          await audio.play();
+        } else {
+          audio.pause();
+        }
+      } catch (error) {
+        audioStatus.textContent =
+          "음성을 재생하지 못했어요. 파일 이름과 업로드 여부를 확인한 뒤 아래 재생 버튼을 눌러 주세요.";
+      }
+    });
+
+    audio.addEventListener("play", () => {
+      voiceButton.textContent = "Ⅱ  잠시 멈추기";
+      audioStatus.textContent = "";
+    });
+
+    audio.addEventListener("pause", () => {
+      voiceButton.textContent = "▷  글로 다 못 한 말";
+    });
+
+    audio.addEventListener("ended", () => {
+      voiceButton.textContent = "↻  한 번 더 듣기";
+      audioStatus.textContent =
+        "이 목소리가, 오늘의 작은 선물이 되었으면.";
+    });
+
+    audio.addEventListener("error", () => {
+      audioStatus.textContent =
+        "음성 파일을 찾거나 읽을 수 없어요. 파일 이름과 형식을 확인해 주세요.";
+    });
+  </script>
+</body>
+</html>
